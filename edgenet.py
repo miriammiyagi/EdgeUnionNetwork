@@ -15,6 +15,7 @@ edgecounter=0
 numtrees=0
 
 def cleanComments(filepath):
+#cleanComments removes comments from the newick files at filepath.
 	for item in glob.glob(filepath):
 		with open(item, 'r+') as tf:
 			text=tf.read()
@@ -25,19 +26,17 @@ def cleanComments(filepath):
 			tf.close()
 
 def multi_new(filepath):
+#multi_new allows the script to take in files with multiple newick trees within the same file.
 	returnlist=[]
 	f= open(filepath).read()
 	composite=f.split(';')
 	for item in composite:
-#		item=item.strip()
 		if item.strip():
-			#print "'",item,"'"
-			#print len(item)
 			returnlist.append((item+';').strip('\n'))
-#	print returnlist
 	return returnlist
 
 def inputSet(filepath):
+#inputSet takes in a filepath and grabs trees from the input and runs the algorithm, returning a graph.
 	global numtrees
 	G=nx.DiGraph()
 	print glob.glob(filepath)
@@ -55,6 +54,7 @@ def inputSet(filepath):
 	return G
 
 def tree_dfs(node,nodesum,nodecount,network,d):
+#tree_dfs conducts a depth first search using what we know about maximum possible distances between start and end nodes.
 	global edgecounter
 	for child in list(node.children):
 		endsum=0
@@ -67,6 +67,7 @@ def tree_dfs(node,nodesum,nodecount,network,d):
 		tree_dfs(child,endsum,counter,network,d)
 
 def pruneNet(network):
+#pruneNet removes redundant arcs.
 	global removaltracker
 	for e in network.edges():
 		if ne_dfs(e[0],False,network[e[0]][e[1]]['size'],0,network,e[0],e[1]):
@@ -77,6 +78,7 @@ def pruneNet(network):
 	return network.edges()
 
 def ne_dfs(pri,readyflag,boundary,lengthtot,network,start,goal):
+#ne_dfs conducts a network depth first search.
 	if start==goal:
 		return False
 	else:
