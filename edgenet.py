@@ -66,7 +66,7 @@ def tree_dfs(node,nodesum,nodecount,network,d):
 		edgecounter+=1
 		tree_dfs(child,endsum,counter,network,d)
 
-def pruneNet(network):
+def pruneNet(network,filepath=False):
 #pruneNet removes redundant arcs.
 	global removaltracker
 	for e in network.edges():
@@ -75,6 +75,10 @@ def pruneNet(network):
 			network.remove_edge(e[0],e[1])
 		nx.set_node_attributes(network,'seen',False)
 	print 'networkedges: ',len(network.edges())
+	if filepath:
+		fp=open(filepath,'w')
+		fp.write(to_numpy_matrix(network))
+		fp.close()
 	return network.edges()
 
 def ne_dfs(pri,readyflag,boundary,lengthtot,network,start,goal):
