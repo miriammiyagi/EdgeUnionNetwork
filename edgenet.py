@@ -77,7 +77,9 @@ def pruneNet(network,filepath=False):
 	print 'networkedges: ',len(network.edges())
 	if filepath:
 		fp=open(filepath,'w')
-		fp.write(to_numpy_matrix(network))
+		nx.write_edgelist(network,filepath)
+		#fp.write(nx.to_numpy_matrix(network))
+		#np.savetxt(filepath,nx.to_numpy_matrix(network))
 		fp.close()
 	return network.edges()
 
@@ -103,7 +105,7 @@ def ne_dfs(pri,readyflag,boundary,lengthtot,network,start,goal):
 	return False
 
 cleanComments(sys.argv[1])
-pruneNet(inputSet(sys.argv[1]))
+pruneNet(inputSet(sys.argv[1]),sys.argv[2])
 print 'edges: ', edgecounter
 print 'trees: ', numtrees
 print 'removed: ',removaltracker
