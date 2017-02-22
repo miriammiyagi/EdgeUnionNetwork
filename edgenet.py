@@ -1,6 +1,6 @@
 #Tree Edge Union Network Construction Script
 #by Michael Miyagi
-#Last edited on 12/31/16
+#Last edited on 2/21/17
 #Required packages: ETE, NetworkX
 
 import numpy as np
@@ -9,6 +9,7 @@ import sys
 from ete3 import Tree
 import glob
 import re
+import os
 
 removaltracker=0
 edgecounter=0
@@ -35,7 +36,7 @@ def multi_new(filepath):
 			returnlist.append((item+';').strip('\n'))
 	return returnlist
 
-def inputSet(filepath):
+def inputSet(filepath,outputKey):
 #inputSet takes in a filepath and grabs trees from the input and runs the algorithm, returning a graph.
 	global numtrees
 	G=nx.DiGraph()
@@ -43,8 +44,15 @@ def inputSet(filepath):
 	d = {}
 	t=Tree(multi_new(glob.glob(filepath)[0])[0])
 	leaflist=t.get_leaf_names()
+	fp=open(outputKey,'w')
+	fp.write("[")
 	for index,leaf in enumerate(leaflist):
 		d[leaf]=2**index
+		fp.write("[\""+str(leaf)+"\","+str(index)+"],")
+	fp.seek(-1,os.SEEK_END)
+	fp.truncate()
+	fp.write("]")
+	fp.close()
 	for fileitem in glob.glob(filepath):
 		for item in multi_new(fileitem):
 			numtrees+=1
@@ -66,7 +74,7 @@ def tree_dfs(node,nodesum,nodecount,network,d):
 		edgecounter+=1
 		tree_dfs(child,endsum,counter,network,d)
 
-def pruneNet(network,filepath=False):
+def pruneNet(network,filepath):#=False):
 #pruneNet removes redundant arcs.
 	global removaltracker
 	for e in network.edges():
@@ -75,12 +83,12 @@ def pruneNet(network,filepath=False):
 			network.remove_edge(e[0],e[1])
 		nx.set_node_attributes(network,'seen',False)
 	print 'networkedges: ',len(network.edges())
-	if filepath:
-		fp=open(filepath,'w')
-		nx.write_edgelist(network,filepath)
+#	if filepath:
+	#	fp.open(filepath,'w')
+	nx.write_edgelist(network,filepath)
 		#fp.write(nx.to_numpy_matrix(network))
 		#np.savetxt(filepath,nx.to_numpy_matrix(network))
-		fp.close()
+	#	fp.close()
 	return network.edges()
 
 def ne_dfs(pri,readyflag,boundary,lengthtot,network,start,goal):
@@ -105,7 +113,7 @@ def ne_dfs(pri,readyflag,boundary,lengthtot,network,start,goal):
 	return False
 
 cleanComments(sys.argv[1])
-pruneNet(inputSet(sys.argv[1]),sys.argv[2])
+pruneNet(inputSet(sys.argv[1],sys.argv[3]),sys.argv[2])
 print 'edges: ', edgecounter
 print 'trees: ', numtrees
 print 'removed: ',removaltracker
